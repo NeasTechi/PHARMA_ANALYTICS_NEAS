@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
-const OPENAI_KEY = Deno.env.get('OPENAI_API_KEY')
+const GROQ_KEY = Deno.env.get('GROQ_API_KEY')
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -12,8 +12,8 @@ serve(async (req) => {
         return new Response('ok', { headers: corsHeaders })
     }
 
-    if (!OPENAI_KEY) {
-        return new Response(JSON.stringify({ error: 'OPENAI_API_KEY not configured' }), {
+    if (!GROQ_KEY) {
+        return new Response(JSON.stringify({ error: 'GROQ_API_KEY not configured' }), {
             status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
@@ -34,14 +34,14 @@ serve(async (req) => {
             ? 'You are a pharma analytics assistant. Answer using the provided summary. Be concise.'
             : 'You are a pharma sales analyst.'
 
-        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${OPENAI_KEY}`,
+                Authorization: `Bearer ${GROQ_KEY}`,
             },
             body: JSON.stringify({
-                model: 'gpt-4o-mini',
+                model: 'llama-3.1-8b-instant',
                 messages: [
                     { role: 'system', content: system },
                     { role: 'user', content: userContent },
