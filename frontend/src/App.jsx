@@ -11,6 +11,7 @@ const Analytics = lazy(() => import('./pages/Analytics'))
 const Insights = lazy(() => import('./pages/Insights'))
 const DataManagement = lazy(() => import('./pages/DataManagement'))
 const Settings = lazy(() => import('./pages/Settings'))
+const Privacy = lazy(() => import('./pages/Privacy'))
 
 function PageLoader() {
     return (
@@ -47,6 +48,7 @@ export default function App() {
                 <Route path="insights" element={<Suspense fallback={<PageLoader />}><Insights /></Suspense>} />
                 <Route path="data" element={<Suspense fallback={<PageLoader />}><DataManagement session={session} onAuth={setSession} /></Suspense>} />
                 <Route path="settings" element={<Suspense fallback={<PageLoader />}><Settings session={session} onAuth={setSession} /></Suspense>} />
+                <Route path="privacy" element={<Suspense fallback={<PageLoader />}><Privacy /></Suspense>} />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
         </Routes>

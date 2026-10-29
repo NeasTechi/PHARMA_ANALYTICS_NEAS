@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { LayoutDashboard, BarChart3, Bot, Database, Menu, Settings as SettingsIcon } from 'lucide-react'
 import { useTheme } from '../hooks/useTheme'
+import CookieBanner from './CookieBanner'
 import Logo from './Logo'
 
 const nav = [
@@ -72,8 +73,13 @@ export default function Layout({ session, onAuth }) {
                     </main>
                     <footer className="border-t border-gray-200/70 dark:border-gray-800 px-4 md:px-8 py-4 text-xs text-gray-500 dark:text-gray-400 flex flex-col sm:flex-row items-center justify-between gap-2">
                         <p>Pharma Analytics — sales intelligence dashboard for tracking revenue, profit, and anomalies.</p>
-                        <p>Created by <span className="font-semibold text-brand-600 dark:text-brand-400">NEASTECH</span></p>
+                        <div className="flex items-center gap-3">
+                            <a href="/privacy" className="hover:text-brand-600 transition">Privacy</a>
+                            <span>·</span>
+                            <p>Created by <span className="font-semibold text-brand-600 dark:text-brand-400">NEASTECH</span></p>
+                        </div>
                     </footer>
+                    <CookieBanner />
                 </div>
             </div>
         </div>
