@@ -19,7 +19,7 @@ export default function Layout({ session, onAuth }) {
     return (
         <div className={dark ? 'dark' : ''}>
             <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
-                <aside className={`${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:static z-40 w-64 h-screen bg-white dark:bg-gray-900 border-r border-gray-200/70 dark:border-gray-800 transition-transform duration-300 flex flex-col`}>
+                <aside className={`${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:static z-40 w-16 hover:w-64 h-screen bg-white dark:bg-gray-900 border-r border-gray-200/70 dark:border-gray-800 transition-all duration-300 flex flex-col group overflow-hidden`}>
                     <div className="p-6 border-b border-gray-200/70 dark:border-gray-800">
                         <Logo />
                     </div>
@@ -38,8 +38,8 @@ export default function Layout({ session, onAuth }) {
                                 }
                                 onClick={() => setOpen(false)}
                             >
-                                <n.Icon className="w-4.5 h-4.5" size={18} />
-                                <span>{n.label}</span>
+                                <n.Icon className="w-5 h-5 shrink-0" size={20} />
+                                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">{n.label}</span>
                             </NavLink>
                         ))}
                     </nav>
@@ -70,6 +70,10 @@ export default function Layout({ session, onAuth }) {
                     <main className="flex-1 p-4 md:p-8 overflow-auto animate-fade-in">
                         <Outlet context={{ session }} />
                     </main>
+                    <footer className="border-t border-gray-200/70 dark:border-gray-800 px-4 md:px-8 py-4 text-xs text-gray-500 dark:text-gray-400 flex flex-col sm:flex-row items-center justify-between gap-2">
+                        <p>Pharma Analytics — sales intelligence dashboard for tracking revenue, profit, and anomalies.</p>
+                        <p>Created by <span className="font-semibold text-brand-600 dark:text-brand-400">NEASTECH</span></p>
+                    </footer>
                 </div>
             </div>
         </div>
