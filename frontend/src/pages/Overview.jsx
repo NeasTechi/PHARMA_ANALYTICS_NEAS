@@ -1,28 +1,45 @@
 import { useSalesData } from '../hooks/useSalesData'
 import ChartsPanel from '../components/ChartsPanel'
-import { summarize } from '../lib/anomalies'
+import { summarize, groupByMonth } from '../lib/anomalies'
 
-function Kpi({ label, value, accent, hint }) {
+function Kpi({ label, value, accent, hint, delta }) {
     return (
         <div className="card p-5 relative overflow-hidden group hover:shadow-lg transition-shadow">
             <div className={`absolute -top-6 -right-6 w-24 h-24 rounded-full ${accent} opacity-10 group-hover:opacity-20 transition-opacity`} />
             <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{label}</p>
             <p className="text-2xl md:text-3xl font-extrabold mt-2 tracking-tight">{value}</p>
-            {hint && <p className="text-xs text-gray-400 mt-1">{hint}</p>}
+            <div className="flex items-center gap-2 mt-1">
+                {delta !== null && delta !== undefined && (
+                    <span className={`text-xs font-semibold ${delta >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                        {delta >= 0 ? '▲' : '▼'} {Math.abs(delta).toFixed(1)}%
+                    </span>
+                )}
+                {hint && <p className="text-xs text-gray-400">{hint}</p>}
+            </div>
         </div>
     )
 }
 
 export default function Overview() {
-    const { rows, loading, error, progress } = useSalesData()
+    const { rows, loading, error, progress, refresh } = useSalesData()
     const summary = summarize(rows)
+    const monthly = groupByMonth(rows)
+    const last = monthly[monthly.length - 1]
+    const prev = monthly[monthly.length - 2]
+    const revDelta = prev && prev.revenue ? ((last.revenue - prev.revenue) / prev.revenue) * 100 : null
+    const profitDelta = prev && prev.profit ? ((last.profit - prev.profit) / prev.profit) * 100 : null
 
     if (loading) return <Skeleton progress={progress} />
-    if (error) return <div className="text-red-500">Error: {error}</div>
+    if (error) return (
+        <div className="card p-8 text-center">
+            <p className="text-red-500 mb-3">Error: {error}</p>
+            <button onClick={refresh} className="btn-primary">Retry</button>
+        </div>
+    )
 
     const cards = [
-        { label: 'Total Revenue', value: `₱ ${summary.revenue.toLocaleString()}`, accent: 'bg-brand-500', hint: `${summary.count} transactions` },
-        { label: 'Total Profit', value: `₱ ${summary.profit.toLocaleString()}`, accent: 'bg-accent-500', hint: `${((summary.profit / (summary.revenue || 1)) * 100).toFixed(1)}% margin` },
+        { label: 'Total Revenue', value: `₱ ${summary.revenue.toLocaleString()}`, accent: 'bg-brand-500', hint: `${summary.count} transactions`, delta: revDelta },
+        { label: 'Total Profit', value: `₱ ${summary.profit.toLocaleString()}`, accent: 'bg-accent-500', hint: `${((summary.profit / (summary.revenue || 1)) * 100).toFixed(1)}% margin`, delta: profitDelta },
         { label: 'Items Sold', value: summary.items.toLocaleString(), accent: 'bg-brand-300', hint: 'units moved' },
         { label: 'Avg. Order Value', value: `₱ ${(summary.revenue / (summary.count || 1)).toFixed(2)}`, accent: 'bg-accent-300', hint: 'per transaction' },
     ]

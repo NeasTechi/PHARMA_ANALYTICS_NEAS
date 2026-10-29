@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { getSession, onAuthChange, signOut } from './lib/auth'
 import Layout from './components/Layout'
+import { ToastProvider } from './components/Toast'
 
 const Overview = lazy(() => import('./pages/Overview'))
 const Analytics = lazy(() => import('./pages/Analytics'))
@@ -33,6 +34,7 @@ export default function App() {
     }
 
     return (
+        <ToastProvider>
         <Routes>
             <Route element={<Layout session={session} onAuth={handleAuth} />}>
                 <Route index element={<Suspense fallback={<PageLoader />}><Overview /></Suspense>} />
@@ -42,5 +44,6 @@ export default function App() {
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
         </Routes>
+        </ToastProvider>
     )
 }

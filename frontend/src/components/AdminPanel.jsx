@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { useToast } from '../hooks/useToast'
 
 export default function AdminPanel({ products, onRefresh }) {
     const [form, setForm] = useState({
@@ -14,6 +15,7 @@ export default function AdminPanel({ products, onRefresh }) {
     const [deleteKey, setDeleteKey] = useState('')
     const [msg, setMsg] = useState('')
     const [busy, setBusy] = useState(false)
+    const toast = useToast()
 
     const set = (k, v) => setForm((f) => ({ ...f, [k]: v }))
 
@@ -36,8 +38,9 @@ export default function AdminPanel({ products, onRefresh }) {
             })
             if (error) throw error
             setMsg('Row inserted successfully.')
+            toast('Row inserted successfully.')
             onRefresh()
-        } catch (err) { setMsg('Error: ' + err.message) }
+        } catch (err) { setMsg('Error: ' + err.message); toast('Error: ' + err.message, 'error') }
         finally { setBusy(false) }
     }
 
@@ -49,9 +52,10 @@ export default function AdminPanel({ products, onRefresh }) {
             const { error } = await supabase.from('fact_sales').delete().eq('sales_key', Number(deleteKey))
             if (error) throw error
             setMsg(`Deleted sales_key ${deleteKey}.`)
+            toast(`Deleted sales_key ${deleteKey}.`)
             setDeleteKey('')
             onRefresh()
-        } catch (err) { setMsg('Error: ' + err.message) }
+        } catch (err) { setMsg('Error: ' + err.message); toast('Error: ' + err.message, 'error') }
         finally { setBusy(false) }
     }
 

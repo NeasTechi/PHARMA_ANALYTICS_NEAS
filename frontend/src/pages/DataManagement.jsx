@@ -5,7 +5,7 @@ import Login from './Login'
 export default function DataManagement({ session, onAuth }) {
     const { products, loading, error, refresh } = useSalesData()
     if (loading) return <div className="text-gray-500">Loading...</div>
-    if (error) return <div className="text-red-500">Error: {error}</div>
+    if (error) return <div className="card p-8 text-center"><p className="text-red-500 mb-3">Error: {error}</p><button onClick={refresh} className="btn-primary">Retry</button></div>
 
     if (!session) {
         return (
