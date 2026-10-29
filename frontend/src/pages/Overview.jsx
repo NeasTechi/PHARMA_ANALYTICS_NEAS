@@ -14,10 +14,10 @@ function Kpi({ label, value, accent, hint }) {
 }
 
 export default function Overview() {
-    const { rows, loading, error } = useSalesData()
+    const { rows, loading, error, progress } = useSalesData()
     const summary = summarize(rows)
 
-    if (loading) return <Skeleton />
+    if (loading) return <Skeleton progress={progress} />
     if (error) return <div className="text-red-500">Error: {error}</div>
 
     const cards = [
@@ -68,9 +68,10 @@ export default function Overview() {
     )
 }
 
-function Skeleton() {
+function Skeleton({ progress }) {
     return (
         <div className="space-y-6 animate-pulse">
+            <div className="text-sm text-gray-500">Loading rows... {progress}</div>
             <div className="h-8 w-48 bg-gray-200 dark:bg-gray-800 rounded" />
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 {Array.from({ length: 4 }).map((_, i) => <div key={i} className="card h-28" />)}
