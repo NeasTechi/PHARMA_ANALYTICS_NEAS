@@ -9,9 +9,9 @@ export default function Login({ session, onAuth }) {
 
     if (session) {
         return (
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <span style={{ fontSize: '14px' }}>Admin: {session.user.email}</span>
-                <button onClick={async () => { await signOut(); onAuth(null) }} style={{ padding: '6px 12px' }}>Sign out</button>
+            <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-600 dark:text-gray-300">Admin: {session.user.email}</span>
+                <button onClick={async () => { await signOut(); onAuth(null) }} className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">Sign out</button>
             </div>
         )
     }
@@ -31,11 +31,11 @@ export default function Login({ session, onAuth }) {
     }
 
     return (
-        <form onSubmit={handle} style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <input type="email" placeholder="admin email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ padding: '6px' }} />
-            <input type="password" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)} required style={{ padding: '6px' }} />
-            <button type="submit" disabled={busy} style={{ padding: '6px 12px' }}>{busy ? '...' : 'Admin login'}</button>
-            {err && <span style={{ color: 'red', fontSize: '13px' }}>{err}</span>}
+        <form onSubmit={handle} className="flex flex-wrap gap-2 items-center">
+            <input type="email" placeholder="admin email" value={email} onChange={(e) => setEmail(e.target.value)} required className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm" />
+            <input type="password" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm" />
+            <button type="submit" disabled={busy} className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700 disabled:opacity-50">{busy ? '...' : 'Admin login'}</button>
+            {err && <span className="text-red-500 text-sm">{err}</span>}
         </form>
     )
 }

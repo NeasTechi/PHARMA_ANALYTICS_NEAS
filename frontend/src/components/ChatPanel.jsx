@@ -23,13 +23,13 @@ export default function ChatPanel({ rows }) {
     }
 
     return (
-        <div style={{ background: 'white', padding: '20px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
-            <h2 style={{ marginTop: 0 }}>Ask about your data</h2>
-            <form onSubmit={handleAsk} style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="e.g. Which category grew most?" style={{ flex: 1, padding: '8px' }} />
-                <button type="submit" disabled={loading} style={{ padding: '8px 16px' }}>{loading ? '...' : 'Ask'}</button>
+        <div className="card p-6">
+            <h2 className="text-xl font-bold mb-4">Ask about your data</h2>
+            <form onSubmit={handleAsk} className="flex gap-2 mb-4">
+                <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="e.g. Which category grew most?" className="input flex-1" />
+                <button type="submit" disabled={loading} className="btn-primary">{loading ? '...' : 'Ask'}</button>
             </form>
-            {answer && <div style={{ whiteSpace: 'pre-wrap', padding: '12px', background: '#f9fafb', borderRadius: '6px' }}>{answer}</div>}
+            {answer && <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm whitespace-pre-wrap leading-relaxed">{answer}</div>}
         </div>
     )
 }
