@@ -1,107 +1,147 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { getSession, onAuthChange } from '../lib/auth'
+import ChartsPanel from '../components/ChartsPanel'
+import AdminPanel from '../components/AdminPanel'
+import AnomalyPanel from '../components/AnomalyPanel'
+import ChatPanel from '../components/ChatPanel'
+import Login from './Login'
+import { summarize } from '../lib/anomalies'
+
+function parseDateKey(dk) {
+    const y = Math.floor(dk / 10000)
+    const m = Math.floor((dk % 10000) / 100)
+    const d = dk % 100
+    return new Date(y, m - 1, d)
+}
 
 export default function Dashboard() {
+    const [session, setSession] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
-    const [metrics, setMetrics] = useState({ revenue: 0, profit: 0, items: 0 })
-    const [chartData, setChartData] = useState([])
+    const [rows, setRows] = useState([])
+    const [products, setProducts] = useState([])
+
+    // filters
+    const [startDate, setStartDate] = useState('')
+    const [endDate, setEndDate] = useState('')
+    const [category, setCategory] = useState('All')
 
     useEffect(() => {
-        async function fetchData() {
-            try {
-                // Fetch sales and join with the product table to get the category
-                const { data, error } = await supabase
-                    .from('fact_sales')
-                    .select(`
-            total_amount, 
-            profit_amount, 
-            quantity_sold,
-            dim_product (category)
-          `)
+        getSession().then(setSession)
+        const unsub = onAuthChange(setSession)
+        return unsub
+    }, [])
 
-                if (error) throw error
+    async function fetchData() {
+        setLoading(true)
+        setError(null)
+        try {
+            const { data, error } = await supabase
+                .from('fact_sales')
+                .select('sales_key, date_key, total_amount, profit_amount, quantity_sold, dim_product(category, product_key, product_name)')
+                .order('date_key', { ascending: true })
+                .limit(10000)
+            if (error) throw error
+            setRows(data || [])
 
-                // 1. Calculate Dashboard Totals
-                let totalRevenue = 0
-                let totalProfit = 0
-                let totalItems = 0
-                const categoryMap = {}
-
-                data.forEach(row => {
-                    totalRevenue += Number(row.total_amount || 0)
-                    totalProfit += Number(row.profit_amount || 0)
-                    totalItems += Number(row.quantity_sold || 0)
-
-                    // 2. Group Data by Product Category for the Chart
-                    const categoryName = row.dim_product?.category || 'Unknown'
-                    if (!categoryMap[categoryName]) {
-                        categoryMap[categoryName] = { name: categoryName, revenue: 0, profit: 0 }
-                    }
-                    categoryMap[categoryName].revenue += Number(row.total_amount || 0)
-                    categoryMap[categoryName].profit += Number(row.profit_amount || 0)
-                })
-
-                setMetrics({ revenue: totalRevenue, profit: totalProfit, items: totalItems })
-                setChartData(Object.values(categoryMap))
-
-            } catch (err) {
-                setError(err.message)
-            } finally {
-                setLoading(false)
-            }
+            const { data: prods } = await supabase.from('dim_product').select('*').order('product_key')
+            setProducts(prods || [])
+        } catch (err) {
+            setError(err.message)
+        } finally {
+            setLoading(false)
         }
+    }
 
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchData()
     }, [])
+
+    const categories = useMemo(() => ['All', ...Array.from(new Set(rows.map((r) => r.dim_product?.category).filter(Boolean)))], [rows])
+
+    const filtered = useMemo(() => {
+        return rows.filter((r) => {
+            const d = parseDateKey(r.date_key)
+            if (startDate && d < new Date(startDate)) return false
+            if (endDate && d > new Date(endDate)) return false
+            if (category !== 'All' && r.dim_product?.category !== category) return false
+            return true
+        })
+    }, [rows, startDate, endDate, category])
+
+    const summary = summarize(filtered)
+
+    function exportCsv() {
+        const header = ['sales_key', 'date_key', 'category', 'total_amount', 'profit_amount', 'quantity_sold']
+        const lines = [header.join(',')]
+        filtered.forEach((r) => {
+            lines.push([r.sales_key, r.date_key, r.dim_product?.category || '', r.total_amount, r.profit_amount, r.quantity_sold].join(','))
+        })
+        const blob = new Blob([lines.join('\n')], { type: 'text/csv' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'pharma_sales.csv'
+        a.click()
+        URL.revokeObjectURL(url)
+    }
 
     if (loading) return <div style={{ padding: '20px' }}>Loading Pharma Analytics...</div>
     if (error) return <div style={{ color: 'red', padding: '20px' }}>Error: {error}</div>
 
+    const isAdmin = !!session
+
     return (
-        <div style={{ padding: '30px', fontFamily: 'sans-serif', maxWidth: '1000px', margin: '0 auto' }}>
-            <h1>Pharma Analytics Dashboard</h1>
-
-            {/* Top Metric Cards */}
-            <div style={{ display: 'flex', gap: '20px', marginBottom: '40px' }}>
-                <div style={{ flex: 1, padding: '20px', background: '#f0f9ff', borderRadius: '8px', border: '1px solid #bae6fd' }}>
-                    <h3 style={{ margin: 0, color: '#0369a1' }}>Total Revenue</h3>
-                    <p style={{ fontSize: '28px', fontWeight: 'bold', margin: '10px 0 0 0' }}>
-                        ₱ {metrics.revenue.toLocaleString()}
-                    </p>
-                </div>
-                <div style={{ flex: 1, padding: '20px', background: '#f0fdf4', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
-                    <h3 style={{ margin: 0, color: '#15803d' }}>Total Profit</h3>
-                    <p style={{ fontSize: '28px', fontWeight: 'bold', margin: '10px 0 0 0' }}>
-                        ₱ {metrics.profit.toLocaleString()}
-                    </p>
-                </div>
-                <div style={{ flex: 1, padding: '20px', background: '#fefce8', borderRadius: '8px', border: '1px solid #fef08a' }}>
-                    <h3 style={{ margin: 0, color: '#a16207' }}>Items Sold</h3>
-                    <p style={{ fontSize: '28px', fontWeight: 'bold', margin: '10px 0 0 0' }}>
-                        {metrics.items.toLocaleString()}
-                    </p>
-                </div>
+        <div style={{ padding: '30px', fontFamily: 'sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
+                <h1 style={{ margin: 0 }}>Pharma Analytics Dashboard</h1>
+                <Login session={session} onAuth={setSession} />
             </div>
 
-            {/* Bar Chart */}
-            <div style={{ background: 'white', padding: '20px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
-                <h2 style={{ marginTop: 0 }}>Revenue by Product Category</h2>
-                <div style={{ height: '400px', width: '100%' }}>
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip formatter={(value) => `₱${Number(value).toLocaleString()}`} />
-                            <Legend />
-                            <Bar dataKey="revenue" name="Revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                            <Bar dataKey="profit" name="Profit" fill="#10b981" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
+            {/* Filters */}
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '20px', alignItems: 'end' }}>
+                <label>From <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} /></label>
+                <label>To <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} /></label>
+                <label>Category
+                    <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                        {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                </label>
+                <button onClick={exportCsv} style={{ padding: '6px 12px' }}>Export CSV</button>
+                <span style={{ fontSize: '13px', color: '#6b7280' }}>{filtered.length} of {rows.length} rows</span>
             </div>
+
+            {/* Metric cards */}
+            <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                {[
+                    { label: 'Total Revenue', value: `₱ ${summary.revenue.toLocaleString()}`, bg: '#f0f9ff', border: '#bae6fd', color: '#0369a1' },
+                    { label: 'Total Profit', value: `₱ ${summary.profit.toLocaleString()}`, bg: '#f0fdf4', border: '#bbf7d0', color: '#15803d' },
+                    { label: 'Items Sold', value: summary.items.toLocaleString(), bg: '#fefce8', border: '#fef08a', color: '#a16207' },
+                    { label: 'Transactions', value: summary.count.toLocaleString(), bg: '#f5f3ff', border: '#ddd6fe', color: '#6d28d9' },
+                ].map((c) => (
+                    <div key={c.label} style={{ flex: 1, minWidth: '180px', padding: '20px', background: c.bg, borderRadius: '8px', border: `1px solid ${c.border}` }}>
+                        <h3 style={{ margin: 0, color: c.color }}>{c.label}</h3>
+                        <p style={{ fontSize: '24px', fontWeight: 'bold', margin: '10px 0 0 0' }}>{c.value}</p>
+                    </div>
+                ))}
+            </div>
+
+            <ChartsPanel rows={filtered} />
+
+            <div style={{ marginTop: '20px' }}>
+                <AnomalyPanel rows={filtered} />
+            </div>
+            <div style={{ marginTop: '20px' }}>
+                <ChatPanel rows={filtered} />
+            </div>
+
+            {isAdmin && (
+                <div style={{ marginTop: '20px' }}>
+                    <AdminPanel products={products} onRefresh={fetchData} />
+                </div>
+            )}
         </div>
     )
 }
