@@ -42,7 +42,7 @@ export default function Analytics() {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-2xl font-bold">Analytics</h2>
+                <h2 className="text-3xl font-extrabold tracking-tight">Analytics</h2>
                 <p className="text-gray-500 text-sm">Filter and explore sales trends</p>
             </div>
             <div className="flex flex-wrap gap-4 items-end bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">

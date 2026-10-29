@@ -19,99 +19,81 @@ export default function AdminPanel({ products, onRefresh }) {
 
     async function handleInsert(e) {
         e.preventDefault()
-        setBusy(true)
-        setMsg('')
+        setBusy(true); setMsg('')
         try {
-            const qty = Number(form.quantity_sold)
-            const price = Number(form.unit_price)
-            const disc = Number(form.discount_amount || 0)
-            const tax = Number(form.tax_amount || 0)
+            const qty = Number(form.quantity_sold), price = Number(form.unit_price)
+            const disc = Number(form.discount_amount || 0), tax = Number(form.tax_amount || 0)
             const cost = Number(form.cost_amount || 0)
             const total = qty * price - disc + tax
             const profit = total - cost
             const { error } = await supabase.from('fact_sales').insert({
                 date_key: Number(form.date_key),
                 product_key: Number(form.product_key),
-                quantity_sold: qty,
-                unit_price: price,
-                discount_amount: disc,
-                tax_amount: tax,
-                total_amount: Number(total.toFixed(2)),
-                cost_amount: cost,
+                quantity_sold: qty, unit_price: price, discount_amount: disc, tax_amount: tax,
+                total_amount: Number(total.toFixed(2)), cost_amount: cost,
                 profit_amount: Number(profit.toFixed(2)),
                 transaction_id: `TXN-MANUAL-${Date.now()}`,
             })
             if (error) throw error
             setMsg('Row inserted successfully.')
             onRefresh()
-        } catch (err) {
-            setMsg('Error: ' + err.message)
-        } finally {
-            setBusy(false)
-        }
+        } catch (err) { setMsg('Error: ' + err.message) }
+        finally { setBusy(false) }
     }
 
     async function handleDelete(e) {
         e.preventDefault()
         if (!deleteKey) return
-        setBusy(true)
-        setMsg('')
+        setBusy(true); setMsg('')
         try {
             const { error } = await supabase.from('fact_sales').delete().eq('sales_key', Number(deleteKey))
             if (error) throw error
             setMsg(`Deleted sales_key ${deleteKey}.`)
             setDeleteKey('')
             onRefresh()
-        } catch (err) {
-            setMsg('Error: ' + err.message)
-        } finally {
-            setBusy(false)
-        }
+        } catch (err) { setMsg('Error: ' + err.message) }
+        finally { setBusy(false) }
     }
 
     return (
-        <div style={{ background: 'white', padding: '20px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
-            <h2 style={{ marginTop: 0 }}>Admin: Manage Data</h2>
-            {msg && <div style={{ marginBottom: '12px', color: msg.startsWith('Error') ? 'red' : 'green' }}>{msg}</div>}
+        <div className="card p-6 space-y-6">
+            <h2 className="text-xl font-bold">Manage Data</h2>
+            {msg && <div className={`text-sm ${msg.startsWith('Error') ? 'text-red-500' : 'text-brand-600'}`}>{msg}</div>}
 
-            <form onSubmit={handleInsert} style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '20px' }}>
-                <label>Product
-                    <select value={form.product_key} onChange={(e) => set('product_key', e.target.value)} style={{ width: '100%' }}>
-                        {products.map((p) => (
-                            <option key={p.product_key} value={p.product_key}>{p.product_name} ({p.category})</option>
-                        ))}
+            <form onSubmit={handleInsert} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label className="text-sm font-medium">Product
+                    <select value={form.product_key} onChange={(e) => set('product_key', e.target.value)} className="input w-full mt-1">
+                        {products.map((p) => <option key={p.product_key} value={p.product_key}>{p.product_name} ({p.category})</option>)}
                     </select>
                 </label>
-                <label>Date (YYYYMMDD)
-                    <input value={form.date_key} onChange={(e) => set('date_key', e.target.value)} required />
+                <label className="text-sm font-medium">Date (YYYYMMDD)
+                    <input value={form.date_key} onChange={(e) => set('date_key', e.target.value)} required className="input w-full mt-1" />
                 </label>
-                <label>Quantity sold
-                    <input type="number" value={form.quantity_sold} onChange={(e) => set('quantity_sold', e.target.value)} required />
+                <label className="text-sm font-medium">Quantity sold
+                    <input type="number" value={form.quantity_sold} onChange={(e) => set('quantity_sold', e.target.value)} required className="input w-full mt-1" />
                 </label>
-                <label>Unit price
-                    <input type="number" step="0.01" value={form.unit_price} onChange={(e) => set('unit_price', e.target.value)} required />
+                <label className="text-sm font-medium">Unit price
+                    <input type="number" step="0.01" value={form.unit_price} onChange={(e) => set('unit_price', e.target.value)} required className="input w-full mt-1" />
                 </label>
-                <label>Discount
-                    <input type="number" step="0.01" value={form.discount_amount} onChange={(e) => set('discount_amount', e.target.value)} />
+                <label className="text-sm font-medium">Discount
+                    <input type="number" step="0.01" value={form.discount_amount} onChange={(e) => set('discount_amount', e.target.value)} className="input w-full mt-1" />
                 </label>
-                <label>Tax
-                    <input type="number" step="0.01" value={form.tax_amount} onChange={(e) => set('tax_amount', e.target.value)} />
+                <label className="text-sm font-medium">Tax
+                    <input type="number" step="0.01" value={form.tax_amount} onChange={(e) => set('tax_amount', e.target.value)} className="input w-full mt-1" />
                 </label>
-                <label>Cost amount
-                    <input type="number" step="0.01" value={form.cost_amount} onChange={(e) => set('cost_amount', e.target.value)} required />
+                <label className="text-sm font-medium">Cost amount
+                    <input type="number" step="0.01" value={form.cost_amount} onChange={(e) => set('cost_amount', e.target.value)} required className="input w-full mt-1" />
                 </label>
-                <div style={{ display: 'flex', alignItems: 'end' }}>
-                    <button type="submit" disabled={busy} style={{ padding: '8px 16px' }}>Add Sale Row</button>
+                <div className="flex items-end">
+                    <button type="submit" disabled={busy} className="btn-primary w-full justify-center">Add Sale Row</button>
                 </div>
             </form>
 
-            <form onSubmit={handleDelete} style={{ display: 'flex', gap: '10px', alignItems: 'end' }}>
-                <label>Delete by sales_key
-                    <input value={deleteKey} onChange={(e) => setDeleteKey(e.target.value)} />
+            <form onSubmit={handleDelete} className="flex gap-3 items-end pt-4 border-t border-gray-200 dark:border-gray-800">
+                <label className="text-sm font-medium flex-1">Delete by sales_key
+                    <input value={deleteKey} onChange={(e) => setDeleteKey(e.target.value)} className="input w-full mt-1" />
                 </label>
-                <button type="submit" disabled={busy} style={{ padding: '8px 16px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '4px' }}>
-                    Delete
-                </button>
+                <button type="submit" disabled={busy} className="px-4 py-2 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition">Delete</button>
             </form>
         </div>
     )
