@@ -1,4 +1,5 @@
 import { useMemo, useState, useRef } from 'react'
+import { Helmet } from 'react-helmet-async'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { useSalesData } from '../hooks/useSalesData'
@@ -64,6 +65,10 @@ export default function Analytics() {
 
     return (
         <div ref={containerRef} className="space-y-6">
+            <Helmet>
+                <title>Analytics · Pharma Analytics</title>
+                <meta name="description" content="Filter and explore pharma sales trends by date and category." />
+            </Helmet>
             <div>
                 <h2 className="text-3xl font-extrabold tracking-tight">Analytics</h2>
                 <p className="text-gray-500 text-sm">Filter and explore sales trends</p>

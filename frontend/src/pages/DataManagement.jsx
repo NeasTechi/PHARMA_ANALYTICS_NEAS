@@ -1,6 +1,7 @@
 import { useSalesData } from '../hooks/useSalesData'
 import AdminPanel from '../components/AdminPanel'
 import Login from './Login'
+import { Helmet } from 'react-helmet-async'
 
 export default function DataManagement({ session, onAuth }) {
     const { products, loading, error, refresh } = useSalesData()
@@ -10,6 +11,7 @@ export default function DataManagement({ session, onAuth }) {
     if (!session) {
         return (
             <div className="space-y-6">
+                <Helmet><title>Data Management · Pharma Analytics</title></Helmet>
                 <div>
                     <h2 className="text-2xl font-bold">Data Management</h2>
                     <p className="text-gray-500 text-sm">Admin access required</p>
@@ -24,6 +26,7 @@ export default function DataManagement({ session, onAuth }) {
 
     return (
         <div className="space-y-6">
+            <Helmet><title>Data Management · Pharma Analytics</title></Helmet>
             <div>
                 <h2 className="text-2xl font-bold">Data Management</h2>
                 <p className="text-gray-500 text-sm">Add or remove sales records (admin)</p>

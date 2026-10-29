@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 import { getSession, onAuthChange, signOut } from './lib/auth'
 import Layout from './components/Layout'
 import { ToastProvider } from './components/Toast'
@@ -34,6 +35,7 @@ export default function App() {
     }
 
     return (
+        <HelmetProvider>
         <ToastProvider>
         <Routes>
             <Route element={<Layout session={session} onAuth={handleAuth} />}>
@@ -45,5 +47,6 @@ export default function App() {
             </Route>
         </Routes>
         </ToastProvider>
+        </HelmetProvider>
     )
 }
