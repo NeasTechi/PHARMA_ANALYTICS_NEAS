@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
-import { LayoutDashboard, BarChart3, Bot, Database, Sun, Moon, Menu } from 'lucide-react'
+import { LayoutDashboard, BarChart3, Bot, Database, Menu, Settings as SettingsIcon } from 'lucide-react'
+import { useTheme } from '../hooks/useTheme'
 import Logo from './Logo'
 
 const nav = [
@@ -8,10 +9,11 @@ const nav = [
     { to: '/analytics', label: 'Analytics', Icon: BarChart3 },
     { to: '/insights', label: 'AI Insights', Icon: Bot },
     { to: '/data', label: 'Data Management', Icon: Database },
+    { to: '/settings', label: 'Settings', Icon: SettingsIcon },
 ]
 
 export default function Layout({ session, onAuth }) {
-    const [dark, setDark] = useState(false)
+    const { dark } = useTheme()
     const [open, setOpen] = useState(false)
 
     return (
@@ -41,11 +43,8 @@ export default function Layout({ session, onAuth }) {
                             </NavLink>
                         ))}
                     </nav>
-                    <div className="p-4 border-t border-gray-200/70 dark:border-gray-800">
-                        <button onClick={() => setDark(!dark)} className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                            {dark ? <Sun size={16} /> : <Moon size={16} />}
-                            {dark ? 'Light mode' : 'Dark mode'}
-                        </button>
+                    <div className="p-4 border-t border-gray-200/70 dark:border-gray-800 text-xs text-gray-400 text-center">
+                        v1.0 · Pharma Analytics
                     </div>
                 </aside>
 

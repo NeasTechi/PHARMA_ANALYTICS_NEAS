@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
+import { ThemeProvider } from './lib/theme'
 import { getSession, onAuthChange, signOut } from './lib/auth'
 import Layout from './components/Layout'
 import { ToastProvider } from './components/Toast'
@@ -9,6 +10,7 @@ const Overview = lazy(() => import('./pages/Overview'))
 const Analytics = lazy(() => import('./pages/Analytics'))
 const Insights = lazy(() => import('./pages/Insights'))
 const DataManagement = lazy(() => import('./pages/DataManagement'))
+const Settings = lazy(() => import('./pages/Settings'))
 
 function PageLoader() {
     return (
@@ -36,6 +38,7 @@ export default function App() {
 
     return (
         <HelmetProvider>
+        <ThemeProvider>
         <ToastProvider>
         <Routes>
             <Route element={<Layout session={session} onAuth={handleAuth} />}>
@@ -43,10 +46,12 @@ export default function App() {
                 <Route path="analytics" element={<Suspense fallback={<PageLoader />}><Analytics /></Suspense>} />
                 <Route path="insights" element={<Suspense fallback={<PageLoader />}><Insights /></Suspense>} />
                 <Route path="data" element={<Suspense fallback={<PageLoader />}><DataManagement session={session} onAuth={setSession} /></Suspense>} />
+                <Route path="settings" element={<Suspense fallback={<PageLoader />}><Settings session={session} onAuth={setSession} /></Suspense>} />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
         </Routes>
         </ToastProvider>
+        </ThemeProvider>
         </HelmetProvider>
     )
 }
