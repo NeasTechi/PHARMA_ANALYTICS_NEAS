@@ -40,7 +40,7 @@ export default function ChartsPanel({ rows }) {
                 ))}
             </div>
 
-            <div className="h-[360px] w-full">
+            <div className="h-[260px] sm:h-[320px] md:h-[360px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     {tab === 'bar' && (
                         <BarChart data={summary.byCategory} margin={{ top: 10, right: 10, left: 0, bottom: 0 }} barGap={6}>

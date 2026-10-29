@@ -45,11 +45,11 @@ export default function Analytics() {
                 <h2 className="text-3xl font-extrabold tracking-tight">Analytics</h2>
                 <p className="text-gray-500 text-sm">Filter and explore sales trends</p>
             </div>
-            <div className="flex flex-wrap gap-4 items-end bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
-                <label className="text-sm">From <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="block mt-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700" /></label>
-                <label className="text-sm">To <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="block mt-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700" /></label>
-                <label className="text-sm">Category
-                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="block mt-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-end bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                <label className="text-sm w-full sm:w-auto">From <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="block mt-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 w-full sm:w-auto" /></label>
+                <label className="text-sm w-full sm:w-auto">To <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="block mt-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 w-full sm:w-auto" /></label>
+                <label className="text-sm w-full sm:w-auto">Category
+                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="block mt-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 w-full sm:w-auto">
                         {categories.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
                 </label>

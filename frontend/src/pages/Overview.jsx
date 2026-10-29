@@ -31,7 +31,7 @@ export default function Overview() {
         <div className="space-y-6 animate-slide-up">
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
                 <div>
-                    <h2 className="text-3xl font-extrabold tracking-tight">Overview</h2>
+                    <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Overview</h2>
                     <p className="text-gray-500 dark:text-gray-400 mt-1">Pharma sales performance at a glance</p>
                 </div>
                 <div className="text-xs text-gray-400">Last updated · live</div>
