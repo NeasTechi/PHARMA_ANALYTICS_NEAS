@@ -1,3 +1,26 @@
-# Supabase CLI temp
+# ===== General =====
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ===== Frontend =====
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+!frontend/.env.example
+frontend/logs/
+frontend/*.log
+frontend/npm-debug.log*
+frontend/.vscode/*
+!frontend/.vscode/extensions.json
+frontend/.idea
+
+# ===== Backend (Supabase) =====
 backend/supabase/.temp/
 backend/supabase/.branches/
