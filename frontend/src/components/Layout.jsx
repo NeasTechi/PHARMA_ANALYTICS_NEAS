@@ -19,7 +19,7 @@ export default function Layout({ session, onAuth }) {
     return (
         <div className={dark ? 'dark' : ''}>
             <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
-                <aside className={`${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:static z-40 w-16 hover:w-64 h-screen bg-white dark:bg-gray-900 border-r border-gray-200/70 dark:border-gray-800 transition-all duration-300 flex flex-col group overflow-hidden`}>
+                <aside className={`${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:sticky top-0 z-40 w-16 hover:w-64 h-screen bg-white dark:bg-gray-900 border-r border-gray-200/70 dark:border-gray-800 transition-all duration-300 flex flex-col group overflow-hidden`}>
                     <div className="p-6 border-b border-gray-200/70 dark:border-gray-800">
                         <Logo />
                     </div>
