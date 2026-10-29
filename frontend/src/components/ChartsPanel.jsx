@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { groupByMonth, summarize } from '../lib/anomalies'
 
-const COLORS = ['#0d9488', '#f59e0b', '#6366f1', '#ec4899', '#14b8a6', '#a855f7', '#ef4444']
+const COLORS = ['#2563eb', '#10b981', '#60a5fa', '#34d399', '#1d4ed8', '#059669', '#93c5fd']
 
 const tooltipStyle = {
     contentStyle: { borderRadius: '12px', border: '1px solid #e5e7eb', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' },
@@ -49,8 +49,8 @@ export default function ChartsPanel({ rows }) {
                             <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
                             <Tooltip {...tooltipStyle} formatter={(v) => `₱${Number(v).toLocaleString()}`} />
                             <Legend />
-                            <Bar dataKey="revenue" name="Revenue" fill="#0d9488" radius={[8, 8, 0, 0]} />
-                            <Bar dataKey="profit" name="Profit" fill="#f59e0b" radius={[8, 8, 0, 0]} />
+                            <Bar dataKey="revenue" name="Revenue" fill="#2563eb" radius={[8, 8, 0, 0]} />
+                            <Bar dataKey="profit" name="Profit" fill="#10b981" radius={[8, 8, 0, 0]} />
                         </BarChart>
                     )}
                     {tab === 'line' && (
@@ -60,8 +60,8 @@ export default function ChartsPanel({ rows }) {
                             <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
                             <Tooltip {...tooltipStyle} formatter={(v) => `₱${Number(v).toLocaleString()}`} />
                             <Legend />
-                            <Line type="monotone" dataKey="revenue" name="Revenue" stroke="#0d9488" strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
-                            <Line type="monotone" dataKey="profit" name="Profit" stroke="#f59e0b" strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
+                            <Line type="monotone" dataKey="revenue" name="Revenue" stroke="#2563eb" strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
+                            <Line type="monotone" dataKey="profit" name="Profit" stroke="#10b981" strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
                         </LineChart>
                     )}
                     {tab === 'pie' && (

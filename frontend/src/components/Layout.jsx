@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
+import { LayoutDashboard, BarChart3, Bot, Database, Sun, Moon, Menu } from 'lucide-react'
 import Logo from './Logo'
 
 const nav = [
-    { to: '/', label: 'Overview', icon: '📊' },
-    { to: '/analytics', label: 'Analytics', icon: '📈' },
-    { to: '/insights', label: 'AI Insights', icon: '🤖' },
-    { to: '/data', label: 'Data Management', icon: '🗂️' },
+    { to: '/', label: 'Overview', Icon: LayoutDashboard },
+    { to: '/analytics', label: 'Analytics', Icon: BarChart3 },
+    { to: '/insights', label: 'AI Insights', Icon: Bot },
+    { to: '/data', label: 'Data Management', Icon: Database },
 ]
 
 export default function Layout({ session, onAuth }) {
@@ -35,14 +36,15 @@ export default function Layout({ session, onAuth }) {
                                 }
                                 onClick={() => setOpen(false)}
                             >
-                                <span className="text-base">{n.icon}</span>
+                                <n.Icon className="w-4.5 h-4.5" size={18} />
                                 <span>{n.label}</span>
                             </NavLink>
                         ))}
                     </nav>
-                    <div className="p-4 border-t border-gray-200/70 dark:border-gray-800 space-y-2">
+                    <div className="p-4 border-t border-gray-200/70 dark:border-gray-800">
                         <button onClick={() => setDark(!dark)} className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                            {dark ? '☀️ Light mode' : '🌙 Dark mode'}
+                            {dark ? <Sun size={16} /> : <Moon size={16} />}
+                            {dark ? 'Light mode' : 'Dark mode'}
                         </button>
                     </div>
                 </aside>
@@ -51,7 +53,9 @@ export default function Layout({ session, onAuth }) {
 
                 <div className="flex-1 flex flex-col min-w-0">
                     <header className="h-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200/70 dark:border-gray-800 flex items-center justify-between px-4 md:px-8 sticky top-0 z-20">
-                        <button className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setOpen(true)}>☰</button>
+                        <button className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setOpen(true)}>
+                            <Menu size={20} />
+                        </button>
                         <div className="hidden md:block text-sm text-gray-500">Pharma Sales Intelligence</div>
                         <div className="flex items-center gap-3">
                             {session ? (

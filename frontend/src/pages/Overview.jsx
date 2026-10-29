@@ -23,8 +23,8 @@ export default function Overview() {
     const cards = [
         { label: 'Total Revenue', value: `₱ ${summary.revenue.toLocaleString()}`, accent: 'bg-brand-500', hint: `${summary.count} transactions` },
         { label: 'Total Profit', value: `₱ ${summary.profit.toLocaleString()}`, accent: 'bg-accent-500', hint: `${((summary.profit / (summary.revenue || 1)) * 100).toFixed(1)}% margin` },
-        { label: 'Items Sold', value: summary.items.toLocaleString(), accent: 'bg-emerald-500', hint: 'units moved' },
-        { label: 'Avg. Order Value', value: `₱ ${(summary.revenue / (summary.count || 1)).toFixed(2)}`, accent: 'bg-purple-500', hint: 'per transaction' },
+        { label: 'Items Sold', value: summary.items.toLocaleString(), accent: 'bg-brand-300', hint: 'units moved' },
+        { label: 'Avg. Order Value', value: `₱ ${(summary.revenue / (summary.count || 1)).toFixed(2)}`, accent: 'bg-accent-300', hint: 'per transaction' },
     ]
 
     return (
