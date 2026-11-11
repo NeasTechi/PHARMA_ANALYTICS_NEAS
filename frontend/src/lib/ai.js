@@ -29,8 +29,32 @@ export async function askData(question, summary, rows) {
         sampleRows = rows.slice(0, 20)
     }
 
-    // Try to filter by category if the question mentions "category" or "product X"
-    if ((question || '').toLowerCase().includes('category') || (question || '').toLowerCase().includes('product')) {
+    // Try to filter by product name if "product" is mentioned with a product name
+    const productNameMatch = question.match(/product[^\n]*?([A-Za-z][A-Za-z0-9\s]{0,50})/i)
+    if (productNameMatch) {
+        const suggestedProduct = productNameMatch[1].trim()
+        // Only filter if the suggested product looks like a real name (not just function words)
+        if (suggestedProduct.length > 2) {
+            sampleRows = sampleRows.filter((row) => {
+                const pname = row.dim_product?.product_name || ''
+                return pname.toString().toLowerCase().includes(suggestedProduct.toLowerCase())
+            })
+        }
+    }
+
+    // Try to filter by profit amount if question mentions "profit" or "more than"
+    const profitMatch = question.match(/profit[^\n]*?([0-9]+)/i)
+    if (profitMatch && !yearMatch) {
+        const minProfit = parseInt(profitMatch[1])
+        if (!isNaN(minProfit)) {
+            sampleRows = sampleRows.filter((row) => {
+                return (row.profit_amount || 0) >= minProfit
+            })
+        }
+    }
+
+    // Try to filter by category if the question mentions "category"
+    if ((question || '').toLowerCase().includes('category')) {
         sampleRows = sampleRows.filter((row) => row.dim_product?.category != null)
     }
 
