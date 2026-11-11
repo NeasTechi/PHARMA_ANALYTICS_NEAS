@@ -68,6 +68,7 @@ Deno.serve(async (req) => {
     const question = typeof body?.question === 'string' ? body.question.slice(0, 500) : ''
     const summary = body?.summary && typeof body.summary === 'object' ? body.summary : {}
     const anomalies = Array.isArray(body?.anomalies) ? body.anomalies.slice(0, 50) : []
+    const sample = body?.sample
 
     const system = mode === 'ask'
         ? 'You are a pharma analytics assistant. Answer using the provided summary. Be concise.'
@@ -75,7 +76,7 @@ Deno.serve(async (req) => {
 
     const userContent = mode === 'explain'
         ? `You are a pharma sales analyst. Explain what changed, why it might matter, and suggest actions. Keep it concise (bullet points).\n\nSummary: ${JSON.stringify(summary)}\nAnomalies: ${JSON.stringify(anomalies)}`
-        : `Summary: ${JSON.stringify(summary)}\n\nQuestion: ${question}`
+        : `Summary: ${JSON.stringify(summary)}\n\nQuestion: ${question}\n\n${sample || ''}`
 
     try {
         const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
