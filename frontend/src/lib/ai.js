@@ -53,6 +53,19 @@ export async function askData(question, summary, rows) {
         }
     }
 
+    // Try to filter by pharmacy name if "pharmacy" is mentioned with a pharmacy name
+    const pharmacyMatch = question.match(/pharmacy[^\n]*?([A-Za-z][A-Za-z0-9\s]{0,50})/i)
+    if (pharmacyMatch) {
+        const suggestedPharmacy = pharmacyMatch[1].trim()
+        // Only filter if the suggested pharmacy looks like a real name (not just function words)
+        if (suggestedPharmacy.length > 2) {
+            sampleRows = sampleRows.filter((row) => {
+                const pname = row.pharmacy_name || ''
+                return pname.toString().toLowerCase().includes(suggestedPharmacy.toLowerCase())
+            })
+        }
+    }
+
     // Try to filter by category if the question mentions "category"
     if ((question || '').toLowerCase().includes('category')) {
         sampleRows = sampleRows.filter((row) => row.dim_product?.category != null)
