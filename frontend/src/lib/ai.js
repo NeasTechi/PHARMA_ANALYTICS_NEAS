@@ -66,6 +66,19 @@ export async function askData(question, summary, rows) {
         }
     }
 
+    // Try to filter by supplier name if "supplied by" or "supplier" is mentioned
+    const supplierMatch = question.match(/supplier[^\n]*?([A-Za-z][A-Za-z0-9\s]{0,50})/i)
+    if (supplierMatch) {
+        const suggestedSupplier = supplierMatch[1].trim()
+        // Only filter if the suggested supplier looks like a real name
+        if (suggestedSupplier.length > 2) {
+            sampleRows = sampleRows.filter((row) => {
+                const sname = row.supplier_name || ''
+                return sname.toString().toLowerCase().includes(suggestedSupplier.toLowerCase())
+            })
+        }
+    }
+
     // Try to filter by category if the question mentions "category"
     if ((question || '').toLowerCase().includes('category')) {
         sampleRows = sampleRows.filter((row) => row.dim_product?.category != null)

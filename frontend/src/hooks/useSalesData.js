@@ -21,7 +21,7 @@ export function useSalesData() {
             while (true) {
                 const { data, error } = await supabase
                     .from('fact_sales')
-                    .select('sales_key, date_key, total_amount, profit_amount, quantity_sold, pharmacy_name, dim_product(category, product_key, product_name)')
+                    .select('sales_key, date_key, total_amount, profit_amount, quantity_sold, pharmacy_name, supplier_key, dim_product(category, product_key, product_name, strength, manufacturer)')
                     .order('sales_key', { ascending: true })
                     .range(from, from + PAGE_SIZE - 1)
                 if (error) throw error
