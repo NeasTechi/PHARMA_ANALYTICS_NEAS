@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { summarize } from '../lib/anomalies'
 import { askData } from '../lib/ai'
-import { supabase } from '../lib/supabaseClient'
 
 export default function ChatPanel({ rows }) {
     const [q, setQ] = useState('')
@@ -9,28 +8,12 @@ export default function ChatPanel({ rows }) {
     const [loading, setLoading] = useState(false)
     const summary = summarize(rows)
 
-    // Fetch products and suppliers for AI filtering
-    const [products, setProducts] = useState([])
-    const [suppliers, setSuppliers] = useState([])
-
-    // Fetch products and suppliers when rows change
-    useEffect(() => {
-        // Fetch products from dim_product
-        supabase.from('dim_product').select('*').order('product_key').then(({ data }) => {
-            setProducts(data || [])
-        })
-        // Fetch suppliers from dim_supplier
-        supabase.from('dim_supplier').select('*').order('supplier_key').then(({ data }) => {
-            setSuppliers(data || [])
-        })
-    }, [rows])
-
     async function handleAsk(e) {
         e.preventDefault()
         if (!q.trim()) return
         setLoading(true)
         try {
-            const text = await askData(q, summary, rows, products, suppliers)
+            const text = await askData(q, summary, rows)
             setAnswer(text)
         } catch (err) {
             setAnswer('Error: ' + err.message)
