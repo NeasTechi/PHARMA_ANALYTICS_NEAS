@@ -92,8 +92,10 @@ npm run test
    supabase login
    supabase link --project-ref <your-project-ref>
    supabase secrets set GROQ_API_KEY=gsk_your-key
+   supabase secrets set ALLOWED_ORIGIN=https://your-site.example.com
    supabase functions deploy analyze
    ```
+   `ALLOWED_ORIGIN` accepts a comma-separated list of origins and is optional (defaults to `*`).
 
 ## 🧪 Scripts
 

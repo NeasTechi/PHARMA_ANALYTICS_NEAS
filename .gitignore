@@ -22,5 +22,10 @@ frontend/.vscode/*
 frontend/.idea
 
 # ===== Backend (Supabase) =====
+backend/.env
+backend/.env.*
+backend/supabase/.env
+backend/supabase/.env.*
 backend/supabase/.temp/
 backend/supabase/.branches/
+supabase/.temp/
