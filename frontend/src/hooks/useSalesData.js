@@ -2,6 +2,27 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 const PAGE_SIZE = 1000
+const SALES_SELECT = 'sales_key, date_key, total_amount, profit_amount, quantity_sold, pharmacy_name, supplier_key, dim_product(category, product_key, product_name, strength, manufacturer)'
+
+// Supabase caps a response at 1000 rows, so page through the whole table.
+export async function fetchAll(table, select, order, onPage) {
+    let all = []
+    let from = 0
+    while (true) {
+        const { data, error } = await supabase
+            .from(table)
+            .select(select)
+            .order(order, { ascending: true })
+            .range(from, from + PAGE_SIZE - 1)
+        if (error) throw error
+        if (!data || data.length === 0) break
+        all = all.concat(data)
+        onPage?.(all.length)
+        if (data.length < PAGE_SIZE) break
+        from += PAGE_SIZE
+    }
+    return all
+}
 
 export function useSalesData() {
     const [rows, setRows] = useState([])
@@ -15,26 +36,8 @@ export function useSalesData() {
         setError(null)
         setProgress(0)
         try {
-            // Paginate through all rows (Supabase caps at 1000 per request)
-            let all = []
-            let from = 0
-            while (true) {
-                const { data, error } = await supabase
-                    .from('fact_sales')
-                    .select('sales_key, date_key, total_amount, profit_amount, quantity_sold, pharmacy_name, supplier_key, dim_product(category, product_key, product_name, strength, manufacturer)')
-                    .order('sales_key', { ascending: true })
-                    .range(from, from + PAGE_SIZE - 1)
-                if (error) throw error
-                if (!data || data.length === 0) break
-                all = all.concat(data)
-                setProgress(all.length)
-                if (data.length < PAGE_SIZE) break
-                from += PAGE_SIZE
-            }
-            setRows(all)
-
-            const { data: prods } = await supabase.from('dim_product').select('*').order('product_key')
-            setProducts(prods || [])
+            setRows(await fetchAll('fact_sales', SALES_SELECT, 'sales_key', setProgress))
+            setProducts(await fetchAll('dim_product', '*', 'product_key'))
         } catch (err) {
             setError(err.message)
         } finally {
