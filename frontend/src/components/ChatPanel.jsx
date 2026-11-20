@@ -13,7 +13,7 @@ export default function ChatPanel({ rows }) {
         if (!q.trim()) return
         setLoading(true)
         try {
-            const text = await askData(q, summary, rows)
+            const text = await askData(q, summary)
             setAnswer(text)
         } catch (err) {
             setAnswer('Error: ' + err.message)
