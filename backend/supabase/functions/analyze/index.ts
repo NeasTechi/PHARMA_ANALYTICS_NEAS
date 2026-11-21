@@ -34,13 +34,32 @@ Rules:
 - One SELECT or WITH statement. No semicolons, no writes.
 - Join fact_sales to the dimensions on their *_key columns.
 - pharmacy_name and customer_name on fact_sales are NULL; use dim_pharmacy and dim_customer.
+- Match names loosely: ALWAYS use ILIKE '%term%' for product_name, supplier_name, pharmacy_name, customer_name — never exact '=' on names.
+- Split multi-word name queries: if '%full name%' matches nothing, try each word separately (e.g. ILIKE '%Bicol%' AND ILIKE '%Pharmacy%').
 - Results are capped at ${MAX_ROWS} rows, so aggregate with GROUP BY instead of listing raw rows.
-- After the query, answer in 1-3 sentences with the actual numbers. Never show SQL.`
+- Use only these real column names: quantity_sold, unit_price, total_amount, cost_amount, profit_amount, transaction_id, product_name, supplier_name, pharmacy_name, customer_name. Do not invent other names.
+- If a query returns zero rows or all NULLs/zeros for a named entity, retry once with a relaxed match (drop the most restrictive name constraint, or match each word separately). Do NOT answer "no records" until the relaxed query also returns nothing.
+- If the exact name asked for does not exist but a similar one does, say so explicitly with the actual name and numbers.
+- After the query, answer in 1-3 sentences with the actual numbers. Never show SQL.
+- Always include a markdown table of the query results (header row + data rows) after your answer, so the data can be used for graphing. Never show SQL.`
 
 const TOOLS = [{
     type: 'function',
     function: {
         name: 'run_sql',
+        description: 'Run a read-only PostgreSQL SELECT against the pharmacy analytics database.',
+        parameters: {
+            type: 'object',
+            properties: {
+                query: { type: 'string', description: 'A single SELECT or WITH statement.' },
+            },
+            required: ['query'],
+        },
+    },
+}, {
+    type: 'function',
+    function: {
+        name: 'run_sqlcommentary',
         description: 'Run a read-only PostgreSQL SELECT against the pharmacy analytics database.',
         parameters: {
             type: 'object',
@@ -131,6 +150,22 @@ async function groq(body: Record<string, unknown>) {
     return await res.json()
 }
 
+// Detect when a SQL result indicates zero matching rows (empty array, or all 0/NULL values).
+function isEmptyResult(content: string): boolean {
+    try {
+        const parsed = JSON.parse(content)
+        if (Array.isArray(parsed) && parsed.length === 0) return true
+        if (Array.isArray(parsed) && parsed.length === 1) {
+            const obj = parsed[0]
+            if (typeof obj === 'object' && obj !== null) {
+                const vals = Object.values(obj)
+                if (vals.length > 0 && vals.every(v => v === 0 || v === null || v === undefined)) return true
+            }
+        }
+    } catch {}
+    return false
+}
+
 async function ask(question: string, summary: string): Promise<string> {
     if (!question.trim()) return 'Please ask a question about the data.'
 
@@ -156,6 +191,13 @@ async function ask(question: string, summary: string): Promise<string> {
                 content = `ERROR: ${err instanceof Error ? err.message : String(err)}`
             }
             messages.push({ role: 'tool', tool_call_id: call.id, content })
+            // Code-level fallback: force a retry with relaxed name matching on empty results.
+            if (isEmptyResult(content)) {
+                messages.push({
+                    role: 'user',
+                    content: 'The query returned zero matching rows. Retry once with a relaxed name match: use ILIKE with individual words from the name, or drop the supplier/pharmacy constraint entirely. Report any similar names and their actual numbers.'
+                })
+            }
         }
     }
 
